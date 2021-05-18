@@ -7,7 +7,7 @@ include 'header.php'; ?>
 			<div class="breadcrumbs">
 				<ol class="breadcrumb">
 				  <li><a href="#">Home</a></li>
-				  <li class="active">Check out</li>
+				  <li class="active">Check chbvcb git config --global core.editor "code --wait"</li>
 				</ol>
 			</div><!--/breadcrums-->
 
