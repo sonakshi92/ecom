@@ -1,6 +1,23 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
-$conn = mysqli_connect('localhost', 'root', '', 'admin');
+//if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
+//$conn = mysqli_connect('localhost', 'root', '', 'admin');
+define('title', 'Customise Your Product');
+include 'header.php';
+if(isset($_GET['type']) && $_GET['type']!=''){
+	$type=get_safe_value($conn,$_GET['type']);
+	if($type=='status'){
+		$operation=get_safe_value($conn,$_GET['operation']);
+		$id=get_safe_value($conn,$_GET['id']);
+		if($operation=='active'){
+			$status='1';
+		}else{
+			$status='0';
+		}
+		$update_status_sql="update products set status='$status' where id='$id'";
+		mysqli_query($conn,$update_status_sql);
+	}
+}
+
 if(isset($_GET['delete'])){
     $id = $_GET['delete'];
     $sql = "DELETE FROM products WHERE id=$id";
@@ -8,13 +25,11 @@ if(isset($_GET['delete'])){
     echo "Record Deleted";
 }
 
-define('title', 'Customise Your Product');
-include 'header.php'; ?>
+ ?>
 
 <div class="container">
 <div class="row justify-content-container">
 
-<?php if(isset($_SESSION['admin_email'])) {  ?>
 
 <form action="" method="POST">
 <input type="hidden" name="id" value="<?php echo $id;?>">
@@ -75,7 +90,13 @@ on a.brand = c.id");
             <i><?php echo $rows['mrp'];?></i>
         </td>
         <td>
-            <i><?php echo $rows['status'];?></i>
+        <?php
+			if($rows['status']==1){
+			    echo "<a href='?type=status&operation=deactive&id=".$rows['id']."'>Active</a>&nbsp;";
+			}else{
+				echo "<a href='?type=status&operation=active&id=".$rows['id']."'>Deactive</a>&nbsp;";
+				}					
+        ?>
         </td>
 
         <td>
@@ -85,7 +106,7 @@ on a.brand = c.id");
          <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete</a>
         </td>
     </tr> 
-    <?php } ?>
+    <?php  }?>
     </tbody>
 </table>
 </form>
@@ -94,12 +115,7 @@ $(document).ready( function () {
     $('#view').DataTable();
 } );
 </script>
-<?php 
-} else {
-    echo "<script>alert('User Doesnot exist');</script>";
-    echo "Invalid Session, try <a href=login.php> logging in</a> here "; 
-} 
-?>
+
 </div></div>
 </body>
 </html>

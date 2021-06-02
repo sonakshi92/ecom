@@ -1,9 +1,10 @@
 <?php
 //echo '<pre>';
 //print_r($_GET);
-if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
-
-$conn = mysqli_connect('localhost', 'root', '', 'admin');
+//if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
+//$conn = mysqli_connect('localhost', 'root', '', 'admin');
+define('title', 'Edit Product');
+include 'header.php'; 
 $errproduct = '';
 if(isset($_GET['edit'])){
     $id = $_GET['edit'];
@@ -25,17 +26,17 @@ if(isset($_GET['edit'])){
 }
 
 if(isset($_POST['update'])){
-    $id = $_POST['id'];
-    $product = $_POST['product'];
-    $category = $_POST['category'];
-    $brand = $_POST['brand'];
-    $new_image = $_FILES['image'];
-    $short_description = $_POST['short_description'];
-    $description = $_POST['description'];
-    $quantity = $_POST['quantity'];
-    $purchase_price = $_POST['purchase_price'];
-    $mrp = $_POST['mrp'];
-    $status = $_POST['status'];
+    $id = get_safe_value($conn, $_POST['id']);
+    $product = get_safe_value($conn, $_POST['product']);
+    $category = get_safe_value($conn, $_POST['category']);
+    $brand = get_safe_value($conn, $_POST['brand']);
+    $new_image = get_safe_value($conn, $_FILES['image']);
+    $short_description = get_safe_value($conn, $_POST['short_description']);
+    $description = get_safe_value($conn, $_POST['description']);
+    $quantity = get_safe_value($conn, $_POST['quantity']);
+    $purchase_price = get_safe_value($conn, $_POST['purchase_price']);
+    $mrp = get_safe_value($conn, $_POST['mrp']);
+    $status = get_safe_value($conn, $_POST['status']);
     //print_r($_POST);
     
     if (isset($_FILES['image']['tmp_name']))
@@ -58,9 +59,6 @@ if(isset($_POST['update'])){
  } 
 ?>
 
-<?php
-define('title', 'Edit Product');
-include 'header.php'; ?>
 <div class="container">
 
 <?php if(isset($_SESSION['admin_email'])) {  ?>
@@ -83,23 +81,25 @@ category :
 <?php $categories = mysqli_query($conn, "SELECT * FROM categories"); 
 ?>
 <select name="category" class="form-control" required>
-<?php while($rows = mysqli_fetch_assoc($categories)) {?>
-  <option value="<?php echo $rows['id']; ?>"><?php echo $rows['category']; ?></option>
-  <?php } ?>
-</select>
+<?php while($rows = mysqli_fetch_assoc($categories)) {
+    if($rows['id']==$category){
+		echo "<option selected value=".$rows['id'].">".$rows['category']."</option>";
+	}else{
+  echo "<option value=".$rows['id'].">".$rows['category']."</option>";
+ }} ?>
+ </select>
 
 brand :
 <?php $brands = mysqli_query($conn, "SELECT * FROM brands"); 
 ?>
 <select name="brand" class="form-control" required>
-<?php while($row = mysqli_fetch_assoc($brands)) {?>
-  <option value="<?php echo $row['id']; ?>"><?php echo $row['brand']; ?></option>
-  <?php } ?>
+<?php while($row = mysqli_fetch_assoc($brands)) {
+    if($row['id']==$brand){
+		echo "<option selected value=".$row['id'].">".$row['brand']."</option>";
+	}else{
+  echo "<option value=".$row['id'].">".$row['brand']."</option>";
+ }} ?>
 </select>
-
-Status:<input type="radio" name="status" id="0" value="enable" required>Enable 
-       <input type="radio" name="status" id="1" value="disable" required>Disable <br>
-
 
 <button type="submit" name="update" class="btn btn-primary" >Update</button>
 

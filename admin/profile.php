@@ -1,7 +1,6 @@
 <?php
-session_start();
-
-$adminSession = $_SESSION['admin_email'];
+//session_start();
+$admin_email = $_SESSION['admin_email'];
 //$admin_email = $_GET['admin_email'];
 //echo'<pre>'; print_r($adminSession); exit;
 ?>
@@ -21,8 +20,8 @@ include 'header.php'; ?>
     </tr>
   </thead>
 <?php
-$conn = mysqli_connect('localhost', 'root', '', 'admin');
-$query = mysqli_query($conn, "SELECT * FROM info WHERE admin_email='$adminSession'");
+//$conn = mysqli_connect('localhost', 'root', '', 'admin');
+$query = mysqli_query($conn, "SELECT * FROM info WHERE admin_email='$admin_email'");
 
 $row = mysqli_fetch_array($query);
 ?>

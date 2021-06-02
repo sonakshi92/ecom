@@ -8,7 +8,11 @@ if(isset($_POST['login'])) {
 
 	if(mysqli_num_rows($query) > 0){
 		echo "Login Sucessful";
-	} else {
+		$_SESSION['USER_LOGIN']='yes';
+        $_SESSION['USER_ID'] = $row['id'];
+        $_SESSION['USER_name'] = $row['name'];
+
+		} else {
 		echo "Invalid name or email";
 	}
 }

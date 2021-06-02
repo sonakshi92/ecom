@@ -1,98 +1,140 @@
 <?php
-require 'config/config.php';
-if(isset($_GET['product_id'])){
-	$product_id = $_GET['product_id'];
-	$query2 = mysqli_query($conn, "SELECT id, image, product, short_description, mrp FROM products WHERE id='$product_id'");
-//	while($row = mysqli_fetch_array($query2)){
-	//	$itemArray = array($query2[0]["product_id"]=>array('name'=>$query2[0]["name"], 'product_id'=>$query2[0]["product_id"], 'quantity'=>$_POST["quantity"], 'price'=>$query2[0]["price"], 'image'=>$$query2[0]["image"]));
-		if (!empty($_SESSION['cart'])){
-	//		if(in_array($query2[0]["product_id"],array_keys($_SESSION["cart"]))) {
-	//			foreach($_SESSION["cart"] as $k => $v) {
-	//					if($query2[0]["product_id"] == $k) {
-	//						if(empty($_SESSION["cart"][$k]["quantity"])) {
-	//							$_SESSION["cart"][$k]["quantity"] = 0;
-	//						}
-	//						$_SESSION["cart"][$k]["quantity"] += $_POST["quantity"];
-	//					}
-	//			}
-	//		} else {
-	//			$_SESSION["cart"] = array_merge($_SESSION["cart"],$itemArray);
-	//		}
-
-	//	}
-	//	else{
-	//		$_SESSION['cart'] = $row;
-	//	}
-	//}
-	$_SESSION['product_id'] = $product_id;
-	//$cart = "INSERT INTO cart (product_id) VALUES('$product_id')";
-	$add = mysqli_query($conn, $cart);
-	//header('location:cart.php');
-}}
-
-if(isset($_GET['delete'])){
-    $id = $_GET['delete'];
-    $sql = "DELETE FROM cart WHERE id=$id";
-    $del = mysqli_query($conn, $sql);
-    echo "Record Deleted";
-}
-
+if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
 define('title', 'Cart | E-Shopper');
 include 'header.php';
+//add to cart functionality   
+//session_destroy();
+if(isset($_POST['deleteAll'])){ 
+	if(isset($_SESSION['cart'])){ 
+	session_unset(); 
+	echo "<script>alert('Cart is made empty!');</script>";
+	}
+}
+
+
+if(isset($_POST['delete'])){
+	if($_POST['id'] != ''){
+		if(isset($_SESSION['cart'])){ 
+			foreach($_SESSION['cart'] as $key => $value){
+				if($value['id'] == $_POST['id']){
+					unset($_SESSION['cart'][$key]);
+					unset($_SESSION['prodId']);
+					echo "<script> alert('Item Removed'); </script>"; 
+				}
+			}
+		}elseif(isset($_SESSION['prodId'])){
+
+			echo "<script> alert('Session is not set'); </script>"; 
+			unset($_SESSION['prodId']);
+			session_unset();
+		}
+	}
+}
+
+if(isset($_SESSION['prodId'])){ 
+	$sql = mysqli_query($conn, "SELECT * FROM products WHERE id='$_SESSION[prodId]'");
+			while($cartRows = mysqli_fetch_assoc($sql)){
+        if(isset($_SESSION['cart'])){ 
+			$items = array_column($_SESSION['cart'], 'product');
+			$prod = $cartRows['product'];
+			if(in_array($prod, $items)){			}
+			else{
+				$count = count($_SESSION['cart']);
+				$_SESSION["cartItems"]=$count+1;
+				$_SESSION['cart'][$count] = $cartRows;
+				echo "<script>
+				alert('Item added to cart'); 
+				</script>"; 
+			}
+		}else{ 
+			$_SESSION["cartItems"] = 1;
+			$_SESSION['cart']['0'] = $cartRows;
+			echo "<script>
+			alert('Item added to cart');
+			</script>"; 
+		}
+		}
+	}
+
+
 ?>
 	<section id="cart_items">
 		<div class="container">
 			<div class="breadcrumbs">
-				<ol class="breadcrumb">
-				  <li><a href="#">Home</a></li>
-				  <li class="active">Shopping Cart</li>
+				<ol>
+				<li class="cart_delete">
+							<form action="" method="POST">
+							<input type="hidden" name="prodId" value="<?php echo $product['id']; ?>">
+								<button name="deleteAll" class="cart_quantity_delete btn-warning" href=""><i class="fa fa-times"></i> Delete</button>
+								</form>
+							</li>
 				</ol>
 			</div>
 			<div class="table-responsive cart_info">
+			<?php
+if(isset($_SESSION['cart'])){
+    $total_price = 0;
+
+?>	
+
 				<table class="table table-condensed">
 					<thead>
 						<tr class="cart_menu">
 							<td class="image">Item</td>
-							<td class="description"></td>
+							<td class="description">Description</td>
 							<td class="price">Price</td>
 							<td class="quantity">Quantity</td>
 							<td class="total">Total</td>
 							<td></td>
 						</tr>
 					</thead>
-					<tbody>
 						<?php
-           				 //$query = mysqli_query($conn, "SELECT * FROM cart");
-			          	 while($rows = mysqli_fetch_array($query2)){
+						//echo "<pre>"; print_r($_SESSION['cart']); echo "</pre>"; 
+							//foreach($sql as $product){
+						 foreach($_SESSION['cart'] as $product){
+							 echo "<pre>";
+							 print_r($product);
         				?>
+					<tbody>
 						<tr>
 							<td class="cart_product">
-								<a href=""><img src="admin/<?php $rows['image']; ?>" alt=""></a>
+								<img src="admin/<?php echo $product['image']; ?>" alt="">
 							</td>
 							<td class="cart_description">
-								<h4><a href=""><?php $row['product']; ?></a></h4>
-								<p>Web ID: <?php $row['id']; ?></p>
+								<h4><?php echo $product['product']; ?></h4>
+								<p>Web ID: <?php echo $product['short_description']; ?></p>
 							</td>
 							<td class="cart_price">
-								<p>$<?php $row['mrp'];?></p>
+								<p>$<?php echo $product['mrp'];?></p>
 							</td>
 							<td class="cart_quantity">
 								<div class="cart_quantity_button">
 									<a class="cart_quantity_up" href=""> + </a>
-									<input class="cart_quantity_input" type="text" name="quantity" value="1" autocomplete="off" size="2">
+									<input class="cart_quantity_input" type="text" name="quantity" value="1" size="2">
 									<a class="cart_quantity_down" href=""> - </a>
 								</div>
 							</td>
 							<td class="cart_total">
-								<p class="cart_total_price">$<?php $quantity * $mrp?></p>
+							<?php		
+								 //foreach($_SESSION['cart'] as $product){
+								 $product_price = $product['quantity']*$product['mrp'];?>
+								<p class="cart_total_price">$<?php echo $quantity * $mrp?></p>
 							</td>
 							<td class="cart_delete">
-								<a class="cart_quantity_delete" href=""><i class="fa fa-times"></i>delete</a>
+							<form action="" method="POST">
+							<input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+								<button type="submit" name="delete" class="cart_quantity_delete btn-danger"><i class="fa fa-times"></i> Delete</button>
+								</form>
 							</td>
 						</tr>
 						 <?php } ?>
 					</tbody>
 				</table>
+				<?php
+			}else{ 
+echo "<h1 align=center style=color:orange>Your Cart Is Empty </h1> <br> ";
+ } ?>
+
 			</div>
 		</div>
 	</section> <!--/#cart_items-->

@@ -1,3 +1,13 @@
+<?php
+require ('../config/config.php');
+require ('functions.inc.php');
+if(isset($_SESSION['ADMIN_LOGIN']) && $_SESSION['ADMIN_LOGIN']!=''){
+ // if (isset($_SESSION['admin_email']) && $_SESSION['admin_email'] !=''){
+
+} else {
+   header('location: login.php');
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,8 +88,9 @@
         </div>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="logout.php"> Logout </a>
+        <a class="nav-link" href="logout.php"> Logout <?php echo date('Y'); ?>  </a>
       </li>
+      
     </ul>
   </div>
 </nav>

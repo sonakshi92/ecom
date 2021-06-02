@@ -1,20 +1,23 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
-$conn = mysqli_connect('localhost', 'root', '', 'admin');
+//if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
+
+define('title', 'Add New Product');
+include 'header.php'; 
+//$conn = mysqli_connect('localhost', 'root', '', 'admin');
 $product = $errproduct = $errsku = $image = "";
 
 if(isset($_POST['add'])){
-  $product = $_POST['product'];
-  $sku = $_POST['sku'];
-  $category = $_POST['category'];
-  $brand = $_POST['brand'];
+  $product = get_safe_value($conn, $_POST['product']);
+  $sku = get_safe_value($conn, $_POST['sku']);
+  $category = get_safe_value($conn, $_POST['category']);
+  $brand = get_safe_value($conn, $_POST['brand']);
   $file = $_FILES['image'];
-  $short_description = $_POST['short_description'];
-  $description = $_POST['description'];
-  $quantity = $_POST['quantity'];
-  $purchase_price = $_POST['purchase_price'];
-  $mrp = $_POST['mrp'];
-  $status = $_POST['status'];
+  $short_description = get_safe_value($conn, $_POST['short_description']);
+  $description = get_safe_value($conn, $_POST['description']);
+  $quantity = get_safe_value($conn, $_POST['quantity']);
+  $purchase_price = get_safe_value($conn, $_POST['purchase_price']);
+  $mrp = get_safe_value($conn, $_POST['mrp']);
+  //$status = get_safe_value($conn, $_POST['status']);
   
  // print_r($file);
   $filename = $file['name'];
@@ -46,7 +49,7 @@ if(isset($_POST['add'])){
        if($rows > 0) {
         $errproduct .= "Product already available <br>";
        } else {
-          $sql3 = "INSERT INTO products (product, sku, category, brand, image, short_description, description, quantity, purchase_price, mrp, status) VALUES('$product', '$sku', '$category', '$brand', '$image', '$short_description', '$description', '$quantity', '$purchase_price', '$mrp', '$status')";
+          $sql3 = "INSERT INTO products (product, sku, category, brand, image, short_description, description, quantity, purchase_price, mrp, status) VALUES('$product', '$sku', '$category', '$brand', '$image', '$short_description', '$description', '$quantity', '$purchase_price', '$mrp', '1')";
           $add = mysqli_query($conn, $sql3);
           echo "Product Added";
           header('location: product_list.php');
@@ -55,10 +58,8 @@ if(isset($_POST['add'])){
     }
   }
 }
+?>
 
-
-define('title', 'Add New Product');
-include 'header.php'; ?>
 
 <div class="container">
 
@@ -92,8 +93,6 @@ Description of Product : <textarea name="description" rows="4" cols="50" class="
 Quantity : <input type="number" name="quantity" class="form-control" required>
 Purchase Price : <input type="number" name="purchase_price" class="form-control" required>
 MRP : <input type="number" name="mrp" class="form-control" value="<?php echo $mrp; ?>" required>
-Status:<input type="radio" name="status" id="0" value="enable" required>Enable 
-       <input type="radio" name="status" id="1" value="disable" required>Disable <br>
 
 <button type="submit" name="add" class="btn btn-primary mb-2">
 <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 

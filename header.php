@@ -1,3 +1,7 @@
+<?php
+require 'config/config.php';
+require ('admin/functions.inc.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,7 +94,7 @@
 								<li><a href=""><i class="fa fa-user"></i> Account</a></li>
 								<li><a href=""><i class="fa fa-star"></i> Wishlist</a></li>
 								<li><a href="checkout.php"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-								<li><a href="cart.php"><i class="fa fa-shopping-cart"></i> Cart</a></li>
+								<li><a href="cart.php"><i class="fa fa-shopping-cart"></i> Cart<span class="htc__qua"><?php echo $totalProduct?></span></a></li>
 								<li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
 							</ul>
 						</div>

@@ -1,6 +1,8 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
-$conn = mysqli_connect('localhost', 'root', '', 'admin');
+//if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
+//$conn = mysqli_connect('localhost', 'root', '', 'admin');
+define('title', 'Add New Category');
+include ('header.php'); 
 $errcategory = $category = $description = " ";
 $update = false;
 if(isset($_GET['edit'])){
@@ -16,15 +18,23 @@ if(isset($_GET['edit'])){
 }
 
 if(isset($_POST['update'])){
-    $id = $_POST['id'];
-    $category = $_POST['category'];
+    $id = get_safe_value($conn, $_POST['id']);
+    $category = get_safe_value($conn, $_POST['category']);
     $image = $_FILES['image']['name'];
     $path = 'images/categories/'.$image;
     move_uploaded_file($_FILES['image']['tmp_name'], $path);
-    $description = $_POST['description'];
+    $description = get_safe_value($conn, $_POST['description']);
+    $res = mysqli_query($conn, "SELECT * FROM categories where category='$category'");
       if(empty($category)){
         $errcategory .= "Category cannot be empty";
-      } else {
+        if(isset($_GET['id']) && $_GET['id']!=''){
+			$getData=mysqli_fetch_assoc($res);
+			    if($id==$getData['id']){
+		    	}else{
+				$errcategory .= "Categories already exist";
+	        	}
+    	    }  
+    } else {
           $sql2 = "UPDATE categories SET category='$category', image='$path', description='$description' WHERE id=$id";
           $result = mysqli_query($conn, $sql2);
           echo "Record updated successfully";
@@ -34,8 +44,8 @@ if(isset($_POST['update'])){
 
 
 if(isset($_POST['add'])){
-    $category = $_POST['category'];
-    $description = $_POST['description'];
+    $category = get_safe_value($conn, $_POST['category']);
+    $description = get_safe_value($conn, $_POST['description']);
     $image = $_FILES['image']['name'];
     $path = 'images/categories/'.$image;
     move_uploaded_file($_FILES['image']['tmp_name'], $path);
@@ -43,21 +53,19 @@ if(isset($_POST['add'])){
         $sql = "SELECT * FROM categories where category='$category'";
         $search = mysqli_query($conn, $sql);
         $rows = mysqli_num_rows($search);
-    
         if($rows > 0) {
             $errcategory .= "Category Already Exists";
+            }
         } else{
-            $sql3 = "INSERT INTO categories (category, image, description) VALUES('$category', '$path', '$description')";
+            $sql3 = "INSERT INTO categories (category, image, description, status) VALUES('$category', '$path', '$description', '1')";
             $add = mysqli_query($conn, $sql3);
             echo "Category Added";
        //   header('location: categories_list.php');
-
+        
         }
     }  
-}
 
-define('title', 'Add New Category');
-include 'header.php'; 
+
 ?>
 
 <div class="container">

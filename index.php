@@ -1,17 +1,41 @@
 <?php
-require 'config/config.php';
-if(isset($_GET['cat_id'])){
-	$cat_id = $_GET['cat_id'];
-	$query2 = mysqli_query($conn, "SELECT image, short_description, mrp FROM products WHERE category=$cat_id");
-} else {
-	$query2 = mysqli_query($conn, "SELECT image, short_description, mrp FROM products");
-}
+session_start();
+
+//require 'config/config.php';
 define('title', 'Home | E-Shopper');
 include 'header.php'; 
-?>
+if(isset($_POST['addCart'])){
+	$_SESSION['prodId'] = $_POST['id'];
+   echo "<script>window.location.href='cart.php';</script>";
+}
 
-<form action="" method="POST">
-	
+if (isset($_POST['prodId']) && $_POST['prodId']!=""){
+   $prodId = $_POST['prodId'];
+   $result = mysqli_query(
+   $conn,
+   "SELECT * FROM products WHERE id='$prodId'"
+   );
+   $row = mysqli_fetch_assoc($result);
+   $image = $row['image'];
+   $short_description = $row['short_description'];
+   $mrp = $row['mrp'];
+   
+   $cartArray = array(
+	   $prodId=>array(
+	   'image'=>$image,
+	   'short_description'=>$short_description,
+	   'mrp'=>$mrp,
+	   'quantity'=>1)
+   );
+}
+
+if(isset($_GET['cat_id'])){
+	$cat_id = $_GET['cat_id'];
+	$query2 = mysqli_query($conn, "SELECT id, image, short_description, mrp FROM products WHERE category=$cat_id limit 4");
+} else {
+	$query2 = mysqli_query($conn, "SELECT id, image, short_description, mrp FROM products limit 4");
+}
+?>	
 	<section id="slider"><!--slider-->
 		<div class="container">
 			<div class="row">
@@ -21,9 +45,9 @@ include 'header.php';
 							<?php
 							$result = mysqli_query($conn, "SELECT * FROM carousel");
 							$i = 0;
-							 //while($row = mysqli_fetch_assoc($result)) {
+							 while($row = mysqli_fetch_assoc($result)) {
 								//print_r($row);
-							foreach ($result as $row) {
+							//foreach ($result as $row) {
 								$actives = '';
 								if($i == 0) {
 									$actives = 'active';
@@ -36,8 +60,8 @@ include 'header.php';
 						<div class="carousel-inner">
 							<?php
 							 $i = 0;
-							 //while($row = mysqli_fetch_assoc($result)) {
-								foreach($result as $row) {
+							 while($row = mysqli_fetch_assoc($result)) {
+							//	foreach($result as $row) {
 								$actives = '';
 								if($i == 0){
 									$actives = 'active';
@@ -76,26 +100,28 @@ include 'header.php';
 					<div class="features_items"><!--features_items-->
 						<h2 class="title text-center">Features Items</h2>
 						<?php
-						$query = mysqli_query($conn, "SELECT image, short_description, mrp FROM products");
+						$query = mysqli_query($conn, "SELECT id, product, image, short_description, mrp FROM products limit 6");
 						
-						for($i=0; $row = mysqli_fetch_assoc($query); $i++){
+						while( $row = mysqli_fetch_assoc($query)){
 						?>
+						<form action="" method="POST" enctype="multipart/form-data">
+
 						<div class="col-sm-4">
 							<div class="product-image-wrapper">
 								<div class="single-products">
 										<div class="productinfo text-center">
-											<img src="admin/<?php echo $row['image']; ?>" alt="product"/>
+										<img src="admin/<?php echo $row['image']; ?>" alt="product"/>
 											<h2>$ <?php echo $row['mrp']; ?></h2>
+											<p> <?php echo $row['product']; ?> </p>
 											<p> <?php echo $row['short_description']; ?> </p>
-											<a href="cart.php" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+											
 										</div>
-										<div class="product-overlay">
-											<div class="overlay-content">
+										
 											<h2>$ <?php echo $row['mrp']; ?></h2>
-											<p> <?php echo $row['short_description']; ?> </p>
-											<a href="cart.php" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
-										</div>
-										</div>
+										<!-- <input type="text" name="id" value="<?php // echo $row['id']; ?>"> -->
+										<input type="hidden" name="id" value="<?php echo $row['id']?>">
+											<button type="submit" name="addCart" class="btn btn-warning" style="width:100%;"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
+											
 								</div>
 								<div class="choose">
 									<ul class="nav nav-pills nav-justified">
@@ -105,9 +131,12 @@ include 'header.php';
 								</div>
 							</div>
 						</div>
-                        <?php if($i==5){break;} } ?>	
+	</form>
+
+                        <?php } ?>	
+
 						
-						
+
 					</div><!--features_items-->
 					
 					<div class="category-tab"><!--category-tab-->
@@ -116,19 +145,24 @@ include 'header.php';
 							<?php
 							 $result2 = mysqli_query($conn, "SELECT * FROM categories");
 							 $i = 0;
-								foreach($result2 as $row) {
+						while( $row = mysqli_fetch_assoc($result2)){
+								//foreach($result2 as $row) {
 								$actives = '';
 								if($i == 0){
 									$actives = 'active';
 								}
 							?>
-								<li class="<?php echo $actives ?>"><a href="index.php?cat_id=<?php echo $row['id']; ?>" target="_self" data-toggle="tab"><?php echo $row['category']; ?></a> </li>
+								<li class="<?php echo $actives ?>"><a href="?cat_id=<?php echo $row['id']; ?>" target="_self" data-toggle="tab"><?php echo $row['category']; ?></a> </li>
 								<?php $i++; } ?>	
 										</ul>
 						</div>
 						<div class="tab-content">
 							<div class="tab-pane fade active in" id="tshirt" >
-								<?php foreach($query2 as $row) {  ?>
+								<?php 
+								
+						while( $row = mysqli_fetch_assoc($query2)){
+						//	foreach($query2 as $row) { 
+								 ?>
 											<div class="col-sm-3">								
 									<div class="product-image-wrapper">
 										<div class="single-products">
@@ -136,12 +170,13 @@ include 'header.php';
 									<li><a href="shop.php?bid=<?php echo $row['id']; ?>"> 
 												<h2>$ <?php echo $row['mrp']; ?></h2>
 												<p> <?php echo $row['short_description'];?></p>
-												<a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+												<input type="hidden" name="id" value="<?php echo $row['id']; ?>">
+												<button type="submit" name="addToCart" class="btn btn-warning" style="width:100%;"><i class="fa fa-shopping-cart"></i> Add to Cart</button>
 											</div>
 										</div>
 									</div>
+									<?php } ?>
 								</div>
-								<?php } ?>
 							</div>
 						</div>
 					</div><!--/category-tab-->
@@ -178,5 +213,4 @@ include 'header.php';
 			</div>
 		</div>
 	</section>
-	</form>
 <?php include 'footer.php'; ?>
