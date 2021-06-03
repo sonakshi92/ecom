@@ -32,8 +32,9 @@ if(isset($_POST['delete'])){
 }
 
 if(isset($_SESSION['prodId'])){ 
-	$sql = mysqli_query($conn, "SELECT * FROM products WHERE id='$_SESSION[prodId]'");
+	$sql = mysqli_query($conn, "SELECT id, image, product, short_description, mrp FROM products WHERE id='$_SESSION[prodId]'");
 			while($cartRows = mysqli_fetch_assoc($sql)){
+				print_r($cartRows);
         if(isset($_SESSION['cart'])){ 
 			$items = array_column($_SESSION['cart'], 'product');
 			$prod = $cartRows['product'];
@@ -74,67 +75,66 @@ if(isset($_SESSION['prodId'])){
 			<div class="table-responsive cart_info">
 			<?php
 if(isset($_SESSION['cart'])){
-    $total_price = 0;
+    //$total_cart = 0;
 
 ?>	
 
-				<table class="table table-condensed">
-					<thead>
-						<tr class="cart_menu">
-							<td class="image">Item</td>
-							<td class="description">Description</td>
-							<td class="price">Price</td>
-							<td class="quantity">Quantity</td>
-							<td class="total">Total</td>
-							<td></td>
+<table class="table table-condensed">
+	<thead>
+		<tr class="cart_menu">
+			<td class="image">Item</td>
+			<td class="description">Description</td>
+			<td class="price">Price</td>
+			<td class="quantity">Quantity</td>
+			<td class="total">Total</td>
+			<td></td>
 						</tr>
-					</thead>
-						<?php
-						//echo "<pre>"; print_r($_SESSION['cart']); echo "</pre>"; 
-							//foreach($sql as $product){
-						 foreach($_SESSION['cart'] as $product){
-							 echo "<pre>";
-							 print_r($product);
-        				?>
-					<tbody>
-						<tr>
-							<td class="cart_product">
-								<img src="admin/<?php echo $product['image']; ?>" alt="">
-							</td>
-							<td class="cart_description">
-								<h4><?php echo $product['product']; ?></h4>
-								<p>Web ID: <?php echo $product['short_description']; ?></p>
-							</td>
-							<td class="cart_price">
-								<p>$<?php echo $product['mrp'];?></p>
-							</td>
-							<td class="cart_quantity">
-								<div class="cart_quantity_button">
-									<input class="cart_quantity_input" type="number" name="quantity" value="<?php echo $product['qty']; ?>" min="1" max="10">
-									<a class="cart_quantity_down" href=""> - </a>
-								</div>
-							</td>
-							<td class="cart_total">
-							<?php		
-								 //foreach($_SESSION['cart'] as $product){
-								 $product_price = 1*$product['mrp'];?>
-								<p class="cart_total_price">$<?php echo $product_price?></p>
-							</td>
-							<td class="cart_delete">
-							<form action="" method="POST">
-							<input type="hidden" name="id" value="<?php echo $product['id']; ?>">
-								<button type="submit" name="delete" class="cart_quantity_delete btn-danger"><i class="fa fa-times"></i> Delete</button>
-								</form>
-							</td>
-						</tr>
-						 <?php } ?>
-					</tbody>
-				</table>
+	</thead>
+		<?php
+		//echo "<pre>"; print_r($_SESSION['cart']); echo "</pre>"; 
+			//foreach($sql as $product){
+		 foreach($_SESSION['cart'] as $product){
+			 //$total_cart = $total_cart + $product['mrp'];
+			 $product['qty'] = 1;
+
+			// echo "<pre>";
+			 //print_r($product);
+        ?>
+	<tbody>
+		<tr>
+			<td class="cart_product">
+				<img src="admin/<?php echo $product['image']; ?>" alt="">
+			</td>
+			<td class="cart_description">
+				<h4><?php echo $product['product']; ?></h4>
+				<p>Web ID: <?php echo $product['short_description']; ?></p>
+			</td>
+			<td class="cart_price">
+				<p>$<?php echo $product['mrp'];?></p>
+					<input type="hidden" class="iprice" value="<?php echo $product['mrp']; ?>">
+			</td>
+			<td class="cart_quantity">
+				<div class="cart_quantity_button">
+					<form action="" method="POST">
+					<input class="cart_quantity_input iquantity" onchange="subTotal()" type="number" name="quantity" value="<?php echo $product['qty']; ?>" min="1" max="100">
+					</form>
+				</div>
+			</td>
+			<td class="cart_total itotal">
+			</td>
+			<td class="cart_delete">
+				<form action="" method="POST">
+				<input type="hidden" name="id" value="<?php echo $product['id']; ?>">
+				<button type="submit" name="delete" class="cart_quantity_delete btn-danger"><i class="fa fa-times"></i> Delete</button>
+				</form>
+			</td>
+			</tr>
+			<?php } ?>
+			</tbody></table>
 				<?php
 			}else{ 
-echo "<h1 align=center style=color:orange>Your Cart Is Empty </h1> <br> ";
+				echo "<h1 align=center style=color:orange>Your Cart Is Empty </h1> <br> ";
  } ?>
-
 			</div>
 		</div>
 	</section> <!--/#cart_items-->
@@ -203,12 +203,8 @@ echo "<h1 align=center style=color:orange>Your Cart Is Empty </h1> <br> ";
 				<div class="col-sm-6">
 					<div class="total_area">
 						<ul>
-							<li>Cart Sub Total <span>$59</span></li>
-							<li>Eco Tax <span>$2</span></li>
-							<li>Shipping Cost <span>Free</span></li>
-							<li>Total <span>$61</span></li>
+							<li><h2>Cart Total <span>$</span> <span id="cTotal"></span></h2></li>
 						</ul>
-							<a class="btn btn-default update" href="">Update</a>
 							<a class="btn btn-default check_out" href="">Check Out</a>
 					</div>
 				</div>
@@ -217,3 +213,21 @@ echo "<h1 align=center style=color:orange>Your Cart Is Empty </h1> <br> ";
 	</section><!--/#do_action-->
 
 <?php include 'footer.php'; ?>
+<script>
+	var iprice=document.getElementsByClassName('iprice');
+	var iquantity=document.getElementsByClassName('iquantity');
+	var itotal=document.getElementsByClassName('itotal');
+	var cTotal=document.getElementById('cTotal');
+	var ct=0; //cart total
+
+	function subTotal(){
+		ct=0;
+		for ( i = 0; i < iprice.length; i++) {
+			itotal[i].innerText = (iprice[i].value)*(iquantity[i].value);
+			ct = ct + (iprice[i].value)*(iquantity[i].value);
+		}
+		cTotal.innerText = ct;
+	} 
+
+	subTotal();
+</script>

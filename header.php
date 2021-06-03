@@ -101,7 +101,7 @@ require ('admin/functions.inc.php');
 												$count = count($_SESSION['cart']);
 											}
 										?>
-								<li><a href="cart.php"><i class="fa fa-shopping-cart">(<?php echo $count; ?>)</i> </a></li>
+								<li><a href="cart.php"><i class="fa fa-shopping-cart"> Cart <span style="background-color:orange">(<?php echo $count; ?>)</span></i> </a></li>
 								<li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
 							</ul>
 						</div>
