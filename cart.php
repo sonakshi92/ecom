@@ -16,6 +16,7 @@ if(isset($_POST['delete'])){
 	if($_POST['id'] != ''){
 		if(isset($_SESSION['cart'])){ 
 			foreach($_SESSION['cart'] as $key => $value){
+				//print_r($key)
 				if($value['id'] == $_POST['id']){
 					unset($_SESSION['cart'][$key]);
 					unset($_SESSION['prodId']);
@@ -23,7 +24,6 @@ if(isset($_POST['delete'])){
 				}
 			}
 		}elseif(isset($_SESSION['prodId'])){
-
 			echo "<script> alert('Session is not set'); </script>"; 
 			unset($_SESSION['prodId']);
 			session_unset();
@@ -37,15 +37,16 @@ if(isset($_SESSION['prodId'])){
         if(isset($_SESSION['cart'])){ 
 			$items = array_column($_SESSION['cart'], 'product');
 			$prod = $cartRows['product'];
-			if(in_array($prod, $items)){			}
-			else{
-				$count = count($_SESSION['cart']);
-				$_SESSION["cartItems"]=$count+1;
-				$_SESSION['cart'][$count] = $cartRows;
-				echo "<script>
-				alert('Item added to cart'); 
-				</script>"; 
-			}
+			if(in_array($prod, $items)){	
+				echo "<script>alert('Item already added');</script>";
+					} else{
+						$count = count($_SESSION['cart']);
+						$_SESSION["cartItems"]=$count+1;
+						$_SESSION['cart'][$count] = $cartRows;
+						echo "<script>
+						alert('Item added to cart'); 
+						</script>"; 
+					}
 		}else{ 
 			$_SESSION["cartItems"] = 1;
 			$_SESSION['cart']['0'] = $cartRows;
@@ -109,16 +110,15 @@ if(isset($_SESSION['cart'])){
 							</td>
 							<td class="cart_quantity">
 								<div class="cart_quantity_button">
-									<a class="cart_quantity_up" href=""> + </a>
-									<input class="cart_quantity_input" type="text" name="quantity" value="1" size="2">
+									<input class="cart_quantity_input" type="number" name="quantity" value="<?php echo $product['qty']; ?>" min="1" max="10">
 									<a class="cart_quantity_down" href=""> - </a>
 								</div>
 							</td>
 							<td class="cart_total">
 							<?php		
 								 //foreach($_SESSION['cart'] as $product){
-								 $product_price = $product['quantity']*$product['mrp'];?>
-								<p class="cart_total_price">$<?php echo $quantity * $mrp?></p>
+								 $product_price = 1*$product['mrp'];?>
+								<p class="cart_total_price">$<?php echo $product_price?></p>
 							</td>
 							<td class="cart_delete">
 							<form action="" method="POST">

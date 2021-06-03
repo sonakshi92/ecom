@@ -1,4 +1,5 @@
 <?php
+if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
 require 'config/config.php';
 require ('admin/functions.inc.php');
 ?>
@@ -94,7 +95,13 @@ require ('admin/functions.inc.php');
 								<li><a href=""><i class="fa fa-user"></i> Account</a></li>
 								<li><a href=""><i class="fa fa-star"></i> Wishlist</a></li>
 								<li><a href="checkout.php"><i class="fa fa-crosshairs"></i> Checkout</a></li>
-								<li><a href="cart.php"><i class="fa fa-shopping-cart"></i> Cart<span class="htc__qua"><?php echo $totalProduct?></span></a></li>
+								<?php
+											$count = 0;
+											if(isset($_SESSION['cart'])){
+												$count = count($_SESSION['cart']);
+											}
+										?>
+								<li><a href="cart.php"><i class="fa fa-shopping-cart">(<?php echo $count; ?>)</i> </a></li>
 								<li><a href="login.php"><i class="fa fa-lock"></i> Login</a></li>
 							</ul>
 						</div>
@@ -123,6 +130,7 @@ require ('admin/functions.inc.php');
                                         <li><a href="shop.php">Products</a></li>
 										<li><a href="product-details.php">Product Details</a></li> 
 										<li><a href="checkout.php">Checkout</a></li> 
+										
 										<li><a href="cart.php">Cart</a></li> 
 										<li><a href="login.php">Login</a></li> 
                                     </ul>
