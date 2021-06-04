@@ -31,11 +31,33 @@ if(isset($_POST['delete'])){
 	}
 }
 
+
+if(isset($_POST['update'])){
+	if($_POST['qty'] != ''){
+		if(isset($_SESSION['cart'])){ 
+			foreach($_SESSION['cart'] as $key => $value){
+				//print_r($key)
+				if($value['id'] == $_POST['id']){
+					$_SESSION['cart'][$key]['qty'] = $_POST['qty'];
+					//print_r($_SESSION['cart']);
+				}
+			}
+		}
+	}
+}
 if(isset($_SESSION['prodId'])){ 
 	$sql = mysqli_query($conn, "SELECT id, image, product, short_description, mrp FROM products WHERE id='$_SESSION[prodId]'");
 			while($cartRows = mysqli_fetch_assoc($sql)){
-				print_r($cartRows);
+				$cartArray = array(
+					$prodId=>array(
+					'image'=>$image,
+					'short_description'=>$short_description,
+					'mrp'=>$mrp,
+					'qty'=>1)
+				);
         if(isset($_SESSION['cart'])){ 
+			print_r($_SESSION);
+
 			$items = array_column($_SESSION['cart'], 'product');
 			$prod = $cartRows['product'];
 			if(in_array($prod, $items)){	
@@ -95,7 +117,7 @@ if(isset($_SESSION['cart'])){
 			//foreach($sql as $product){
 		 foreach($_SESSION['cart'] as $product){
 			 //$total_cart = $total_cart + $product['mrp'];
-			 $product['qty'] = 1;
+			 //$product['qty'] = 1;
 
 			// echo "<pre>";
 			 //print_r($product);
@@ -116,8 +138,9 @@ if(isset($_SESSION['cart'])){
 			<td class="cart_quantity">
 				<div class="cart_quantity_button">
 					<form action="" method="POST">
-					<input class="cart_quantity_input iquantity" onchange="subTotal()" type="number" name="quantity" value="<?php echo $product['qty']; ?>" min="1" max="100">
-					</form>
+					<input class="cart_quantity_input iquantity" onchange="subTotal()" type="number" name="qty" value="<?php echo $product['qty']; ?>" min="1" max="100">
+					<button type="submit" name="update" class="cart_quantity_delete btn-warning"> Update</button>
+
 				</div>
 			</td>
 			<td class="cart_total itotal">
