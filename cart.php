@@ -1,5 +1,5 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
+//if (session_status() !== PHP_SESSION_ACTIVE) {    session_start();   }
 define('title', 'Cart | E-Shopper');
 include 'header.php';
 //add to cart functionality   
@@ -46,18 +46,10 @@ if(isset($_POST['update'])){
 	}
 }
 if(isset($_SESSION['prodId'])){ 
-	$sql = mysqli_query($conn, "SELECT id, image, product, short_description, mrp FROM products WHERE id='$_SESSION[prodId]'");
+	$sql = mysqli_query($conn, "SELECT id, image, product, short_description, mrp, qty FROM products WHERE id='$_SESSION[prodId]'");
 			while($cartRows = mysqli_fetch_assoc($sql)){
-				$cartArray = array(
-					$prodId=>array(
-					'image'=>$image,
-					'short_description'=>$short_description,
-					'mrp'=>$mrp,
-					'qty'=>1)
-				);
         if(isset($_SESSION['cart'])){ 
-			print_r($_SESSION);
-
+		//	print_r($_SESSION);
 			$items = array_column($_SESSION['cart'], 'product');
 			$prod = $cartRows['product'];
 			if(in_array($prod, $items)){	
@@ -89,7 +81,7 @@ if(isset($_SESSION['prodId'])){
 				<li class="cart_delete">
 							<form action="" method="POST">
 							<input type="hidden" name="prodId" value="<?php echo $product['id']; ?>">
-								<button name="deleteAll" class="cart_quantity_delete btn-warning" href=""><i class="fa fa-times"></i> Delete</button>
+								<button name="deleteAll" class="cart_quantity_delete btn-warning" href=""><h4> Empty Cart Items </h4></button>
 								</form>
 							</li>
 				</ol>
@@ -228,7 +220,7 @@ if(isset($_SESSION['cart'])){
 						<ul>
 							<li><h2>Cart Total <span>$</span> <span id="cTotal"></span></h2></li>
 						</ul>
-							<a class="btn btn-default check_out" href="">Check Out</a>
+							<a class="btn btn-default check_out" href="checkout.php">Check Out</a>
 					</div>
 				</div>
 			</div>
