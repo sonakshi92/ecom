@@ -49,7 +49,7 @@ if(isset($_POST['add'])){
        if($rows > 0) {
         $errproduct .= "Product already available <br>";
        } else {
-          $sql3 = "INSERT INTO products (product, sku, category, brand, image, short_description, description, quantity, purchase_price, mrp, status) VALUES('$product', '$sku', '$category', '$brand', '$image', '$short_description', '$description', '$quantity', '$purchase_price', '$mrp', '1')";
+          $sql3 = "INSERT INTO products (product, sku, category, brand, image, short_description, description, quantity, purchase_price, mrp, status, qty) VALUES('$product', '$sku', '$category', '$brand', '$image', '$short_description', '$description', '$quantity', '$purchase_price', '$mrp', '1', '1')";
           $add = mysqli_query($conn, $sql3);
           echo "Product Added";
           header('location: product_list.php');

@@ -54,7 +54,8 @@ if(isset($_SESSION['prodId'])){
 			$prod = $cartRows['product'];
 			if(in_array($prod, $items)){	
 				echo "<script>alert('Item already added');</script>";
-					} else{
+					}
+			else{
 						$count = count($_SESSION['cart']);
 						$_SESSION["cartItems"]=$count+1;
 						$_SESSION['cart'][$count] = $cartRows;
@@ -87,8 +88,8 @@ if(isset($_SESSION['prodId'])){
 				</ol>
 			</div>
 			<div class="table-responsive cart_info">
-			<?php
-if(isset($_SESSION['cart'])){
+	<?php
+	if(isset($_SESSION['cart'])){
     //$total_cart = 0;
 
 ?>	
@@ -104,6 +105,7 @@ if(isset($_SESSION['cart'])){
 			<td></td>
 						</tr>
 	</thead>
+	<tbody>
 		<?php
 		//echo "<pre>"; print_r($_SESSION['cart']); echo "</pre>"; 
 			//foreach($sql as $product){
@@ -114,7 +116,6 @@ if(isset($_SESSION['cart'])){
 			// echo "<pre>";
 			 //print_r($product);
         ?>
-	<tbody>
 		<tr>
 			<td class="cart_product">
 				<img src="admin/<?php echo $product['image']; ?>" alt="">
